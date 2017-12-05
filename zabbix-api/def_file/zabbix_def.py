@@ -3,7 +3,7 @@ import json
 
 
 def zabbix_login(url, username, password):
-	header = {"Content-Type": "application/json"}
+	header = {"Content-Type": "application/json-rpc"}
 
 	#################################
 	data = {                        #这是zabbix规定的
@@ -27,7 +27,7 @@ def zabbix_login(url, username, password):
 	return token
 
 def zabbix_get_groupid(url,groupname,token):
-	header = {"Content-Type": "application/json"}
+	header = {"Content-Type": "application/json-rpc"}
 	data = {
     "jsonrpc": "2.0",
     "method": "hostgroup.get",
@@ -48,4 +48,30 @@ def zabbix_get_groupid(url,groupname,token):
 	#将‘str’类型转换为dict类型
 	id = msg['result'][0]['groupid']
 	return id
+
+
+def create_group(url,group_name,token):
+	header = { 'Content-Type': 'application/json-rpc' }
+
+	data = {
+    "jsonrpc": "2.0",
+    "method": "hostgroup.create",
+    "params": {
+        "name": group_name
+    },
+    "auth": token,
+    "id": 1
+	}
+
+	value = json.dumps(data)
+	server = requests.request('post',url,headers=header,data=value)
+	msg = json.loads(server.text)
+	groupid = msg['result']['groupids'][0]
+	return groupid
+
+
+
+
+
+
 
